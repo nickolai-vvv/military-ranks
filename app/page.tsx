@@ -172,6 +172,9 @@ export default function Home() {
             />
           ))}
         </nav>
+        <a className="site-info" href={basePath + "/info.html"}>
+          Источники и данные
+        </a>
       </footer>
     </div>
   );

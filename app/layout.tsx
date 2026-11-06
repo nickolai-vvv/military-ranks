@@ -1,9 +1,12 @@
 import "./style.css";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Воинские звания - тренажёр",
+export const metadata: Metadata = {
+  metadataBase: new URL("https://nickolai-vvv.github.io"),
+  title: "Воинские звания России — тренажёр для изучения",
   description:
-    "Изучайте воинские звания сухопутных войск и флота. Учитесь определять звания и проверяйте свои знания в интерактивном тренажёре.",
+    "Учите воинские звания России по знакам различия. Смотрите изображение, выбирайте один из четырёх ответов и сразу проверяйте себя.",
+  alternates: { canonical: "/military-ranks/" },
 
   keywords: [
     "воинские звания",
@@ -27,9 +30,10 @@ export const metadata = {
   ],
 
   openGraph: {
-    title: "Воинские звания - тренажёр",
+    title: "Воинские звания России — тренажёр для изучения",
     description:
-      "Изучайте воинские звания сухопутных войск и флота и проверяйте свои знания в интерактивном тренажёре.",
+      "Учите воинские звания России по знакам различия в интерактивном тренажёре.",
+    url: "https://nickolai-vvv.github.io/military-ranks/",
     locale: "ru_RU",
     type: "website",
   },
