@@ -3,8 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import Globe from "./Globe";
 import Quiz from "./Quiz";
 
-import army from "../public/ranks/catalog.json";
-import navy from "../public/ranks/navy/catalog.json";
+import army from "../public/ranks/russia/army/catalog.json";
+import navy from "../public/ranks/russia/navy/catalog.json";
 
 const introPhrases = [
   "Насколько хорошо вы знаете воинские звания?",
@@ -17,8 +17,8 @@ const introPhrases = [
 type Branch = "army" | "navy";
 type Screen = "world" | "branches" | Branch;
 const catalogs = {
-  army: { catalog: army, photoDirectory: "/ranks/" },
-  navy: { catalog: navy, photoDirectory: "/ranks/navy/" },
+  army: { catalog: army, photoDirectory: "/ranks/russia/army/" },
+  navy: { catalog: navy, photoDirectory: "/ranks/russia/navy/" },
 };
 const branches: { id: Branch; title: string }[] = [
   { id: "army", title: "Сухопутные войска" },
