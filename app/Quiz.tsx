@@ -34,8 +34,6 @@ export default function Quiz(props: QuizProps) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const first = useRef<HTMLButtonElement>(null);
-  const restoreFocus = useRef(false);
   const keyboardState = useRef({ answer, leaving, q, props });
   keyboardState.current = { answer, leaving, q, props };
   useEffect(
@@ -44,9 +42,6 @@ export default function Quiz(props: QuizProps) {
     },
     [],
   );
-  useEffect(() => {
-    if (restoreFocus.current) first.current?.focus({ preventScroll: true });
-  }, [q]);
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
@@ -75,7 +70,6 @@ export default function Quiz(props: QuizProps) {
     pending.current = setTimeout(
       () => {
         pending.current = null;
-        restoreFocus.current = true;
         setQ(upcoming);
         setAnswer(null);
         setLeaving(false);
@@ -92,7 +86,6 @@ export default function Quiz(props: QuizProps) {
         {q.options.map((name, i) => (
           <button
             key={i}
-            ref={i === 0 ? first : null}
             disabled={answer !== null}
             onClick={() => setAnswer(name)}
             className={
