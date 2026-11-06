@@ -58,18 +58,18 @@ export default function Quiz(props: QuizProps) {
         setAnswer(null);
         setLeaving(false);
       },
-      matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 360,
+      matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 100,
     );
   }
   return (
-    <div key={q.photo} className={"quiz " + (leaving ? "quiz-out" : "quiz-in")}>
+    <div className="quiz" data-changing={leaving}>
       <div className="quizart">
         <img src={q.photo} alt="Погон для определения звания" />
       </div>
       <div className="options">
         {q.options.map((name, i) => (
           <button
-            key={name}
+            key={i}
             ref={i === 0 ? first : null}
             disabled={answer !== null}
             onClick={() => setAnswer(name)}
@@ -81,20 +81,22 @@ export default function Quiz(props: QuizProps) {
                   : ""
             }
           >
-            {name}
+            <span>{name}</span>
           </button>
         ))}
       </div>
-      {answer !== null && (
-        <div className="result">
-          <span className="sr" role="status">
-            {answer === q.correct ? "Верно" : "Верный вариант: " + q.correct}
-          </span>
-          <button disabled={leaving} onClick={next}>
-            Продолжить
-          </button>
-        </div>
-      )}
+      <div className="result">
+        {answer !== null && (
+          <>
+            <span className="sr" role="status">
+              {answer === q.correct ? "Верно" : "Верный вариант: " + q.correct}
+            </span>
+            <button disabled={leaving} onClick={next}>
+              Продолжить
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
