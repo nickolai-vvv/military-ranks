@@ -1,11 +1,43 @@
 'use client';
-import {useState} from 'react';
-const names = ['Рядовой','Ефрейтор','Младший сержант','Сержант','Старший сержант','Старшина','Прапорщик','Старший прапорщик','Младший лейтенант','Лейтенант','Старший лейтенант','Капитан','Майор','Подполковник','Полковник','Генерал-майор','Генерал-лейтенант','Генерал-полковник','Генерал армии','Генерал армии','Маршал Российской Федерации'];
-const codes='OR-1 OR-2 OR-4 OR-5 OR-7 OR-8 OR-9a OR-9b OF-1c OF-1b OF-1a OF-2 OF-3 OF-4 OF-5 OF-6 OF-7 OF-8 OF-9 OF-9 OF-10'.split(' ');
-const src=i=>'/ranks/Russia-Army-'+codes[i]+'-'+(i===19?'2013':'2010')+'.svg.webp';
-function shuffle(items){const a=[...items]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]}return a}
-function question(previous){const index=shuffle(codes.map((_,i)=>i).filter(i=>names[i]!==names[previous]))[0]; const correct=names[index];return {index,correct,options:shuffle([correct,...shuffle([...new Set(names)].filter(n=>n!==correct)).slice(0,3)])}}
-function Anchor(){return <svg viewBox="0 0 200 200" aria-hidden="true"><g fill="none" stroke="currentColor" strokeWidth="8" strokeLinejoin="round"><circle cx="100" cy="33" r="14"/><path d="M100 47v119M70 65h60M34 118q15 38 66 54 51-16 66-54M32 136l1-24 22 10m90 0 22-10 1 24"/></g></svg>}
-export default function Home(){const [q,setQ]=useState(null),[answer,setAnswer]=useState(null),[num,setNum]=useState(0);
-function next(){setQ(question(q?.index));setAnswer(null);setNum(q?num+1:1)}
-return <><header><div className="brand"><b>★</b> ПОГОНЫ РФ</div><span>Учебный тренажёр</span></header><main>{!q?<><small>ТРЕНАЖЁР ЗВАНИЙ</small><h1>Выбор направления</h1><p>Выберите род войск, чтобы начать тренировку.</p><section><button className="card land" onClick={next}><div className="art"><div className="boards">{[12,14,16].map(i=><img key={i} src={src(i)} alt=""/>)}</div></div><div className="caption"><small>ВОЙСКОВЫЕ ЗВАНИЯ</small><h2>Сухопутные войска</h2><strong>Начать тренировку <i>↗</i></strong></div></button><button className="card sea" disabled><div className="art"><Anchor/></div><div className="caption"><small>КОРАБЕЛЬНЫЕ ЗВАНИЯ</small><h2>Военно-морской флот</h2><strong>В разработке</strong></div></button></section></>:<><button className="back" onClick={()=>setQ(null)}>← К выбору направления</button><small>СУХОПУТНЫЕ ВОЙСКА · ВОПРОС {num}</small><h1>Какое это звание?</h1><div className="quizart art"><img src={src(q.index)} alt="Погон для определения звания"/></div><div className="options">{q.options.map(n=><button disabled={answer!==null} key={n} onClick={()=>setAnswer(n)} className={answer!==null && n===q.correct?'correct':answer===n?'wrong':''}>{n}</button>)}</div>{answer!==null&&<div className="result"><span role="status">{answer===q.correct?'Верно!':'Правильный ответ — '+q.correct}</span><button onClick={next}>Следующий погон →</button></div>}</>}</main></>}
+import {useState,useRef,useEffect} from 'react';
+import Globe from './Globe';
+import Quiz from './Quiz';
+
+const branches=[
+  {id:'army',title:'Сухопутные войска',description:'Воинские звания и знаки различия'},
+  {id:'navy',title:'Военно-морской флот',description:'Корабельные звания и знаки различия'}
+];
+const previous={branches:'world',army:'branches',navy:'branches'};
+function AtlasMark(){return <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16"/><ellipse cx="20" cy="20" rx="8" ry="16" transform="rotate(32 20 20)"/><path d="M5 23Q18 12 35 17M9 31Q21 19 36 24"/></svg>}
+
+export default function Home(){
+ const [screen,setScreen]=useState('world'),[leaving,setLeaving]=useState(null);
+ const heading=useRef(null),timer=useRef(null);
+ useEffect(()=>()=>clearTimeout(timer.current),[]);
+ useEffect(()=>{heading.current?.focus({preventScroll:true})},[screen]);
+ function go(target){
+   if(timer.current)return;
+   setLeaving(target);
+   timer.current=setTimeout(()=>{
+     timer.current=null;setScreen(target);setLeaving(null);window.scrollTo(0,0);
+   },matchMedia('(prefers-reduced-motion: reduce)').matches?0:screen==='world'?820:300);
+ }
+ const index=screen==='world'?1:screen==='branches'?2:3;
+ return <div className={'shell '+(screen==='world'?'map':'inner')}>
+ <header><div className="logo"><AtlasMark/>Rank<span>Atlas</span></div><span className="descriptor">СПРАВОЧНИК ВОИНСКИХ ЗВАНИЙ</span></header>
+ <main key={screen} className={leaving?'leaving':''}>
+ {screen==='world'?<div className="world">
+   <Globe active={!!leaving} onSelect={()=>go('branches')}/>
+   <div className="intro"><div className="eyebrow"><b/> КАРТА МИРА</div><h1 tabIndex="-1" ref={heading}>Выбор <br/>страны</h1><p>Выберите страну на глобусе, чтобы<br className="desktop"/> изучить воинские звания и знаки различия.</p></div>
+ </div>:<div className="content"><button className="back" onClick={()=>go(previous[screen])}>←　 Назад</button>
+ {screen==='branches'?<>
+ <div className="eyebrow"><b/> РОССИЯ / ВЫБОР ВИДА ВООРУЖЁННЫХ СИЛ</div>
+ <h1 ref={heading} tabIndex="-1">Виды вооружённых сил</h1>
+ <div className="branches">{branches.map(branch=><button key={branch.id} className={'branch '+(leaving===branch.id?'selected':'')} onClick={()=>go(branch.id)}>
+ <img alt="" src={'/atlas/'+branch.id+'.webp'}/><div className="caption"><span className="dash"/><h2>{branch.title}</h2><p>{branch.description}</p><span className="select">Выбрать　→</span></div></button>)}</div></>:screen==='army'?<><h1 className="sr" tabIndex="-1" ref={heading}>Тренировка</h1><Quiz/></>:<><div className="eyebrow">РОССИЯ / ВОЕННО-МОРСКОЙ ФЛОТ</div><h1 ref={heading} tabIndex="-1">Корабельные звания</h1><p>Раздел в разработке.</p></>}
+ </div>}
+ </main>
+ <footer><div className="steps" aria-label={'Этап '+index+' из 3'}>{[1,2,3].map(i=><b key={i} className={i===index?'active':''}/>)}<span>0{index} / 03</span></div><span>{['Выбор страны','Выбор вида войск','Раздел званий'][index-1]}</span></footer>
+ </div>
+}
+
