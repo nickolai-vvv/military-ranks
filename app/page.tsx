@@ -6,6 +6,9 @@ import Quiz from "./Quiz";
 import army from "../public/ranks/russia/army/catalog.json";
 import navy from "../public/ranks/russia/navy/catalog.json";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const asset = (path: string) => basePath + path;
+
 const introPhrases = [
   "Насколько хорошо вы знаете воинские звания?",
   "Сможете отличить лейтенанта от капитана?",
@@ -128,7 +131,7 @@ export default function Home() {
                       }
                       onClick={() => go(branch.id)}
                     >
-                      <img alt="" src={"/atlas/" + branch.id + ".webp"} />
+                      <img alt="" src={asset("/atlas/" + branch.id + ".webp")} />
                       <div className="caption">
                         <h2>{branch.title}</h2>
                         <span className="select">Выбрать　→</span>

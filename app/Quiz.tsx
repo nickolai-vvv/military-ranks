@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 export type Rank = { photo: string; rank: string };
 type QuizProps = { catalog: readonly Rank[]; photoDirectory: string };
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 function shuffled<T>(items: readonly T[]) {
   const result = [...items];
@@ -23,7 +24,7 @@ function question(
     rankNames.filter((rank) => rank !== entry.rank),
   ).slice(0, 3);
   return {
-    photo: photoDirectory + entry.photo,
+    photo: basePath + photoDirectory + entry.photo,
     correct: entry.rank,
     options: shuffled([entry.rank, ...alternatives]),
   };

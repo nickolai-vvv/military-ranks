@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { softwareRenderer } from "./softwareRenderer";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 const countries = [{ id: "ru", title: "Россия", latitude: 61, longitude: 89 }];
 const rad = Math.PI / 180;
 const tilt = 41 * rad;
@@ -222,7 +224,7 @@ export default function Globe({
         fallback();
       }
     };
-    texture.src = "/atlas/earth.webp";
+    texture.src = basePath + '/atlas/earth.webp';
     return () => {
       stopped = true;
       cancelAnimationFrame(frame);
