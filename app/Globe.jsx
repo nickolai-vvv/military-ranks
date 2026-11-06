@@ -43,11 +43,13 @@ export default function Globe({onSelect, active}){
   const canvas=useRef(null), layer=useRef(null);
   const lowCanvas=useRef(null), drag=useRef(null), manual=useRef(false);
   const view=useRef({longitude:center,latitude:tilt});
+  const target=useRef({...view.current});
   const renderManual=useRef(null);
   function turn(dx,dy){
+    if(!manual.current)target.current={...view.current};
     manual.current=true;
-    const camera=view.current;
-    camera.longitude=(camera.longitude+dx)%(2*Math.PI);
+    const camera=target.current;
+    camera.longitude+=dx;
     camera.latitude=Math.max(-Math.PI/2,Math.min(Math.PI/2,camera.latitude+dy));
     renderManual.current?.();
   }
@@ -87,6 +89,7 @@ export default function Globe({onSelect, active}){
       if(texture.naturalWidth){
         const draw=softwareRenderer(lowCanvas.current,texture);
         renderManual.current=()=>{
+          Object.assign(view.current,target.current);
           draw(view.current.longitude,view.current.latitude);
           updateMarkers();setPhase('software');
         };
@@ -118,17 +121,24 @@ export default function Globe({onSelect, active}){
         const latitude=gl.getUniformLocation(program,'tilt');
         const size=Math.min(1280,Math.ceil(el.clientWidth*Math.min(devicePixelRatio,1.5)));
         el.width=el.height=size;gl.viewport(0,0,size,size);
-        const start=performance.now();let last=-100;
+        const start=performance.now();
+        let previous=start;
         function draw(now){
           if(stopped)return;
-          if(now-last>40){
-            if(!manual.current)view.current.longitude=center+(motion.matches?0:0.17*Math.sin((now-start)/36000));
-            gl.uniform1f(longitude,view.current.longitude);
-            gl.uniform1f(latitude,view.current.latitude);
-            gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-            updateMarkers();
-            last=now;
+          const dt=Math.min(64,now-previous);
+          previous=now;
+          const camera=view.current;
+          if(manual.current){
+            const blend=motion.matches?1:1-Math.exp(-dt/48);
+            camera.longitude+=(target.current.longitude-camera.longitude)*blend;
+            camera.latitude+=(target.current.latitude-camera.latitude)*blend;
+          }else if(!motion.matches){
+            camera.longitude=center+.20*Math.sin((now-start)/24000);
           }
+          gl.uniform1f(longitude,camera.longitude);
+          gl.uniform1f(latitude,camera.latitude);
+          gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+          updateMarkers();
           frame=requestAnimationFrame(draw);
         }
         draw(start);setPhase('ready');
