@@ -65,6 +65,7 @@ footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-
 @media(max-width:760px){.pin-label:before{width:15px}}
 
 .steps button:disabled{cursor:default}.quiz .result button{width:calc((100% - 10px)/2)}
+.options button,.quiz .result button{position:relative}.key-hint{position:absolute;top:6px;right:8px;color:var(--muted);font:10px/1.2 monospace;opacity:.7}.options button span{padding:0 14px}.quiz .result button{padding-right:48px}
 @media(max-width:760px){
   .world{justify-content:center;padding-block:24px}
   .orbital{margin:0}

@@ -36,6 +36,8 @@ export default function Quiz(props: QuizProps) {
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
   const first = useRef<HTMLButtonElement>(null);
   const restoreFocus = useRef(false);
+  const keyboardState = useRef({ answer, leaving, q, props });
+  keyboardState.current = { answer, leaving, q, props };
   useEffect(
     () => () => {
       if (pending.current !== null) clearTimeout(pending.current);
@@ -45,9 +47,28 @@ export default function Quiz(props: QuizProps) {
   useEffect(() => {
     if (restoreFocus.current) first.current?.focus({ preventScroll: true });
   }, [q]);
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && target.closest("input, textarea, select, [contenteditable]")) return;
+      const state = keyboardState.current;
+      if (state.leaving) return;
+      if (state.answer !== null && event.key === "Enter") {
+        event.preventDefault();
+        next();
+      } else if (state.answer === null && /^[1-4]$/.test(event.key)) {
+        event.preventDefault();
+        setAnswer(state.q.options[Number(event.key) - 1]);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
   function next() {
     if (pending.current !== null) return;
-    const upcoming = question(props, q.correct);
+    const current = keyboardState.current;
+    const upcoming = question(current.props, current.q.correct);
     const preload = new Image();
     preload.src = upcoming.photo;
     setLeaving(true);
@@ -83,6 +104,7 @@ export default function Quiz(props: QuizProps) {
             }
           >
             <span>{name}</span>
+            <kbd className="key-hint" aria-hidden="true">{i + 1}</kbd>
           </button>
         ))}
       </div>
@@ -94,6 +116,7 @@ export default function Quiz(props: QuizProps) {
             </span>
             <button disabled={leaving} onClick={next}>
               Продолжить
+              <kbd className="key-hint" aria-hidden="true">Enter</kbd>
             </button>
           </>
         )}
