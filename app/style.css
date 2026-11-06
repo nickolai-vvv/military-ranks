@@ -72,6 +72,6 @@ footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-
 }
 
 .site-info{color:var(--muted);font-size:11px;text-decoration:none}.site-info:hover{text-decoration:underline}
-.info-page{display:block;max-width:760px;min-height:100svh;margin:auto;padding:40px 24px;color:var(--paper)}
+.info-page{display:block;max-width:760px;min-height:100svh;margin:auto;padding:40px 24px;color:var(--paper);animation:none}
 .info-page a{color:var(--amber)}.info-page h1{font-size:clamp(32px,5vw,56px);margin:32px 0}.info-page h2{font-size:22px;margin:32px 0 12px}.info-page p{margin:0 0 16px}.credit-list{columns:2;padding-left:20px}.credit-list li{break-inside:avoid;margin-bottom:8px}
 @media(max-width:760px){.credit-list{columns:1}}

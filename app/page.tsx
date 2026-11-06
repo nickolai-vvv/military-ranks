@@ -41,18 +41,13 @@ export default function Home() {
   useEffect(() => {
     if (introSelected.current) return;
     introSelected.current = true;
-    let index = Math.floor(Math.random() * introPhrases.length);
     try {
-      const key = "introPhraseIndex";
-      const stored = sessionStorage.getItem(key);
-      if (stored !== null && Number.isInteger(Number(stored)) && Number(stored) >= 0) {
-        index = (Number(stored) + 1) % introPhrases.length;
-      }
-      sessionStorage.setItem(key, String(index));
+      localStorage.removeItem("storageChoice");
+      sessionStorage.removeItem("introPhraseIndex");
     } catch {
-      // When tab storage is unavailable, keep the random starting phrase.
+      // Browser storage may be unavailable.
     }
-    setIntroIndex(index);
+    setIntroIndex(Math.floor(Math.random() * introPhrases.length));
   }, []);
   const heading = useRef<HTMLHeadingElement>(null),
     timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -131,7 +126,10 @@ export default function Home() {
                       }
                       onClick={() => go(branch.id)}
                     >
-                      <img alt="" src={asset("/atlas/" + branch.id + ".webp")} />
+                      <img
+                        alt=""
+                        src={asset("/atlas/" + branch.id + ".webp")}
+                      />
                       <div className="caption">
                         <h2>{branch.title}</h2>
                         <span className="select">Выбрать　→</span>
@@ -172,8 +170,8 @@ export default function Home() {
             />
           ))}
         </nav>
-        <a className="site-info" href={basePath + "/info.html"}>
-          Источники и данные
+        <a className="site-info" href={basePath + "/info/"}>
+          Конфиденциальность и источники
         </a>
       </footer>
     </div>
