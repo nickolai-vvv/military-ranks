@@ -6,6 +6,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export const metadata: Metadata = {
   title: "Источники изображений и данные сайта",
   description: "Сведения об изображениях знаков различия и хранении данных на сайте.",
+  alternates: { canonical: "/military-ranks/info.html" },
 };
 
 export default function InfoPage() {
