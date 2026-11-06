@@ -31,7 +31,7 @@ p{color:#b7c0c4;line-height:1.65}
 .loading{position:absolute;bottom:-36px;width:100%;text-align:center}
 footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-items:center}.steps button{display:grid;place-items:center;width:36px;height:44px;padding:0}.steps button:after{content:"";width:26px;height:2px;background:#58626a;transition:background .2s}.steps button[aria-current]:after,.steps button:enabled:hover:after{background:var(--amber)}
 
-.content{width:min(1060px,90%);margin:0 auto;padding:24px 0 40px}.content h1{font-size:clamp(34px,4vw,68px);margin:14px 0 26px}.back{padding:7px 0;margin-bottom:22px;color:#cbd0d1}
+.content{width:min(1060px,90%);margin:0 auto;align-self:center;padding:32px 0}.content h1{font-size:clamp(34px,4vw,68px);margin:14px 0 26px}.back{padding:7px 0;margin-bottom:22px;color:#cbd0d1}
 .branches{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .branch{position:relative;isolation:isolate;overflow:hidden;min-height:380px;height:clamp(380px,54vh,620px);text-align:left;display:flex;align-items:flex-end;padding:clamp(18px,3vw,42px);box-shadow:inset 0 0 0 1px #ffffff21}
 .branch img,.branch:before{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 34%;z-index:-2;transition:transform .65s,filter .5s}
@@ -68,5 +68,6 @@ footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-
 @media(max-width:760px){
   .world{justify-content:center;padding-block:24px}
   .orbital{margin:0}
-  .content{align-self:center;padding-block:16px}
+  .content{padding-block:16px}
 }
+
