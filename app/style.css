@@ -8,7 +8,7 @@ h1:focus{outline:none}
 .shell:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.22;background-image:linear-gradient(#849aaa1c 1px,transparent 1px),linear-gradient(90deg,#849aaa1c 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(120deg,transparent,#000)}
 header,footer{margin:0 5.6vw;display:flex;align-items:center;justify-content:space-between;position:relative}
 header{min-height:84px;border-bottom:1px solid #a2b2bd35;z-index:1}
-.author{font-weight:680;font-size:23px;letter-spacing:-.03em;color:var(--paper);text-decoration:none}.author:hover{color:var(--amber)}.author:focus-visible{outline:2px solid var(--amber);outline-offset:5px}
+.author{font-weight:680;font-size:23px;letter-spacing:-.03em;color:var(--paper);text-decoration:none;transition:color .2s ease}.author:hover{color:var(--amber)}.author:focus-visible{outline:2px solid var(--amber);outline-offset:5px}
 .descriptor,.eyebrow,footer,.back,.select,.loading,.quiz small{font:500 11px/1.6 Consolas,monospace;letter-spacing:.13em;text-transform:uppercase}
 .descriptor,footer{color:var(--muted)}
 .descriptor{font-size:16px;font-weight:700;letter-spacing:.055em;color:var(--paper);text-decoration:none;border-bottom:1px solid #f5bf7080;transition:color .2s,border-color .2s}.descriptor:hover{color:var(--amber);border-color:var(--amber)}.descriptor:focus-visible{outline:2px solid var(--amber);outline-offset:5px}
