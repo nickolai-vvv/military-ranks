@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description:
     "Учите воинские звания России по знакам различия. Смотрите изображение, выбирайте один из четырёх ответов и сразу проверяйте себя.",
   alternates: { canonical: "/military-ranks/" },
+  verification: {
+    google: "I-GJ_QBmLBYzL4VjaOqGB9nzUiW0vx-atjFmAheoRHM",
+  },
 
   keywords: [
     "воинские звания",
