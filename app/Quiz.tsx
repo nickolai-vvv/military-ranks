@@ -34,10 +34,12 @@ export default function Quiz(props: QuizProps) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mounted = useRef(true);
   const keyboardState = useRef({ answer, leaving, q, props });
   keyboardState.current = { answer, leaving, q, props };
   useEffect(
     () => () => {
+      mounted.current = false;
       if (pending.current !== null) clearTimeout(pending.current);
     },
     [],
@@ -67,15 +69,21 @@ export default function Quiz(props: QuizProps) {
     const preload = new Image();
     preload.src = upcoming.photo;
     setLeaving(true);
-    pending.current = setTimeout(
-      () => {
-        pending.current = null;
+    pending.current = setTimeout(async () => {
+        try {
+          await preload.decode();
+        } catch {
+          // The browser can still show its image error state.
+        }
+        if (!mounted.current) return;
         setQ(upcoming);
         setAnswer(null);
-        setLeaving(false);
-      },
-      matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 100,
-    );
+        requestAnimationFrame(() => {
+          if (!mounted.current) return;
+          setLeaving(false);
+          pending.current = null;
+        });
+      }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 130);
   }
   return (
     <div className="quiz" data-changing={leaving}>
