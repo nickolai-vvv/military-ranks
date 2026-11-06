@@ -85,7 +85,7 @@ export default function Globe({onSelect, active}){
       }catch{fallback()}
     };
     texture.src='/atlas/earth.webp';
-    return ()=>{stopped=true;cancelAnimationFrame(frame);el.removeEventListener('webglcontextlost',fallback);texture.onerror=null;gl.getExtension('WEBGL_lose_context')?.loseContext()};
+    return ()=>{stopped=true;cancelAnimationFrame(frame);el.removeEventListener('webglcontextlost',fallback);texture.onerror=null;if(!el.isConnected)gl.getExtension('WEBGL_lose_context')?.loseContext()};
   },[]);
   return <div className={'orbital '+(active?'approach':'')}>
     <div className="orbit" aria-hidden="true"/>
@@ -96,3 +96,4 @@ export default function Globe({onSelect, active}){
     {phase==='loading'&&<span className="loading" role="status">Загрузка глобуса…</span>}
   </div>
 }
+
