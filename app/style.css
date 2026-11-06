@@ -59,6 +59,7 @@ footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-
 .pin-label{top:50%;transform:translateY(-50%);border-bottom:0}
 .pin-label:before{top:50%;bottom:auto;width:33px;transform:none}
 .quizart img,.options button span,.quiz .result button{transition:opacity .14s ease-out}
+.rank-image{animation:arrive .14s ease-out}
 .quiz[data-changing="true"] :is(.quizart img,.options button span,.result button){opacity:0;transition-duration:.1s}
 .quiz .result{min-height:54px}
 .options button span{display:block}

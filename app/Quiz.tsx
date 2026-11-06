@@ -34,6 +34,16 @@ export default function Quiz(props: QuizProps) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cachedImages = useRef<HTMLImageElement[]>([]);
+  useEffect(() => {
+    cachedImages.current = props.catalog.map(({ photo }) => {
+      const image = new Image();
+      image.src = basePath + props.photoDirectory + photo;
+      void image.decode().catch(() => {});
+      return image;
+    });
+    return () => { cachedImages.current = []; };
+  }, [props.catalog, props.photoDirectory]);
   const keyboardState = useRef({ answer, leaving, q, props });
   keyboardState.current = { answer, leaving, q, props };
   useEffect(
@@ -75,7 +85,7 @@ export default function Quiz(props: QuizProps) {
   return (
     <div className="quiz" data-changing={leaving}>
       <div className="quizart">
-        <img src={q.photo} alt="Погон для определения звания" />
+        <img key={q.photo} className="rank-image" src={q.photo} alt="Погон для определения звания" />
       </div>
       <div className="options">
         {q.options.map((name, i) => (
