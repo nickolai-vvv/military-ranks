@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nickolai-vvv.github.io"),
-  title: "Воинские звания России — тренажёр для изучения",
+  title: "Воинские звания России - тренажёр для изучения",
   description:
     "Учите воинские звания России по знакам различия. Смотрите изображение, выбирайте один из четырёх ответов и сразу проверяйте себя.",
   alternates: { canonical: "/military-ranks/" },
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "Воинские звания России — тренажёр для изучения",
+    title: "Воинские звания России - тренажёр для изучения",
     description:
       "Учите воинские звания России по знакам различия в интерактивном тренажёре.",
     url: "https://nickolai-vvv.github.io/military-ranks/",
