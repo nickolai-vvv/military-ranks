@@ -86,7 +86,7 @@ export default function Home() {
     <div className={"shell " + (screen === "world" ? "map" : "inner")}>
       <header>
         <a className="descriptor" href={basePath + "/"}>
-          СПРАВОЧНИК ВОИНСКИХ ЗВАНИЙ
+          ТРЕНАЖЁР ВОИНСКИХ ЗВАНИЙ
         </a>
         <a
           className="author"
