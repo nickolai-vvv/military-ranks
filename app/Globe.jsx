@@ -1,25 +1,28 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
+import { softwareRenderer } from './softwareRenderer';
+
 const countries = [{ id: 'ru', title: 'Россия', latitude: 61, longitude: 89 }];
 const rad = Math.PI / 180;
 const tilt = 41 * rad;
 const center = 70 * rad;
 
-function position(country, longitude) {
+function position(country, longitude, latitude = tilt) {
   const lat = country.latitude * rad;
   const delta = country.longitude * rad - longitude;
   const x = Math.cos(lat) * Math.sin(delta);
-  const y = Math.sin(lat) * Math.cos(tilt) - Math.cos(lat) * Math.cos(delta) * Math.sin(tilt);
-  return { left: (50 + 50*x)+'%', top: (50 - 50*y)+'%' };
+  const y = Math.sin(lat) * Math.cos(latitude) - Math.cos(lat) * Math.cos(delta) * Math.sin(latitude);
+  const visible = Math.sin(lat)*Math.sin(latitude) + Math.cos(lat)*Math.cos(delta)*Math.cos(latitude) > 0;
+  return { visibility: visible?'visible':'hidden', left: (50 + 50*x)+'%', top: (50 - 50*y)+'%' };
 }
 
 const vertex = 'attribute vec2 a; varying vec2 p; void main(){p=a;gl_Position=vec4(a,0.,1.);}';
 const fragment = `precision highp float;
-varying vec2 p; uniform sampler2D earth; uniform float lon;
+varying vec2 p; uniform sampler2D earth; uniform float lon; uniform float tilt;
 void main(){
   float r=dot(p,p); if(r>1.)discard;
-  float z=sqrt(max(0.,1.-r)); float t=radians(41.);
+  float z=sqrt(max(0.,1.-r)); float t=tilt;
   float lat=asin(clamp(p.y*cos(t)+z*sin(t),-1.,1.));
   float lng=lon+atan(p.x,z*cos(t)-p.y*sin(t));
   vec3 tex=texture2D(earth,vec2(fract(lng/6.283185+.5),.5-lat/3.141593)).rgb;
@@ -38,21 +41,65 @@ function shader(gl,type,source){
 
 export default function Globe({onSelect, active}){
   const canvas=useRef(null), layer=useRef(null);
+  const lowCanvas=useRef(null), drag=useRef(null), manual=useRef(false);
+  const view=useRef({longitude:center,latitude:tilt});
+  const renderManual=useRef(null);
+  function turn(dx,dy){
+    manual.current=true;
+    const camera=view.current;
+    camera.longitude=(camera.longitude+dx)%(2*Math.PI);
+    camera.latitude=Math.max(-Math.PI/2,Math.min(Math.PI/2,camera.latitude+dy));
+    renderManual.current?.();
+  }
+  function startDrag(event){
+    if(active || !event.isPrimary || event.button!==0)return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    drag.current={id:event.pointerId,x:event.clientX,y:event.clientY};
+  }
+  function moveDrag(event){
+    const prev=drag.current;
+    if(!prev || prev.id!==event.pointerId)return;
+    const scale=Math.PI/event.currentTarget.clientWidth;
+    turn((prev.x-event.clientX)*scale,(event.clientY-prev.y)*scale);
+    prev.x=event.clientX;prev.y=event.clientY;
+  }
+  function keyTurn(event){
+    const step=10*rad;
+    const offsets={ArrowLeft:[step,0],ArrowRight:[-step,0],ArrowUp:[0,-step],ArrowDown:[0,step]};
+    if(!offsets[event.key])return;
+    event.preventDefault();turn(...offsets[event.key]);
+  }
   const [phase,setPhase]=useState('loading');
   useEffect(()=>{
     const motion=matchMedia('(prefers-reduced-motion: reduce)');
-    if(motion.matches || navigator.connection?.saveData || navigator.deviceMemory<=2){
-      setPhase('poster');return;
-    }
-    const el=canvas.current, gl=el.getContext('webgl',{alpha:true,antialias:true});
-    if(!gl){setPhase('poster');return}
+    const el=canvas.current;
+    const lowPower=navigator.connection?.saveData || navigator.deviceMemory<=2;
+    const gl=lowPower?null:el.getContext('webgl',{alpha:true,antialias:true});
     let frame=0, stopped=false;
-    function fallback(){cancelAnimationFrame(frame);setPhase('poster')}
+    function updateMarkers(){
+      if(!layer.current)return;
+      const {longitude,latitude}=view.current;
+      countries.forEach((c,i)=>Object.assign(layer.current.children[i].style,position(c,longitude,latitude)));
+    }
+    function fallback(){
+      cancelAnimationFrame(frame);
+      if(stopped)return;
+      if(texture.naturalWidth){
+        const draw=softwareRenderer(lowCanvas.current,texture);
+        renderManual.current=()=>{
+          draw(view.current.longitude,view.current.latitude);
+          updateMarkers();setPhase('software');
+        };
+        if(manual.current)renderManual.current();
+        else setPhase('poster');
+      }else setPhase('unavailable');
+    }
     el.addEventListener('webglcontextlost',fallback);
     const texture=new Image();
     texture.onerror=fallback;
     texture.onload=()=>{
       if(stopped)return;
+      if(!gl){fallback();return}
       try{
         const program=gl.createProgram();
         gl.attachShader(program,shader(gl,gl.VERTEX_SHADER,vertex));
@@ -68,15 +115,18 @@ export default function Globe({onSelect, active}){
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,texture);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
         const longitude=gl.getUniformLocation(program,'lon');
+        const latitude=gl.getUniformLocation(program,'tilt');
         const size=Math.min(1280,Math.ceil(el.clientWidth*Math.min(devicePixelRatio,1.5)));
         el.width=el.height=size;gl.viewport(0,0,size,size);
         const start=performance.now();let last=-100;
         function draw(now){
           if(stopped)return;
           if(now-last>40){
-            const angle=center+(motion.matches?0:0.17*Math.sin((now-start)/36000));
-            gl.uniform1f(longitude,angle);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-            countries.forEach((c,i)=>Object.assign(layer.current.children[i].style,position(c,angle)));
+            if(!manual.current)view.current.longitude=center+(motion.matches?0:0.17*Math.sin((now-start)/36000));
+            gl.uniform1f(longitude,view.current.longitude);
+            gl.uniform1f(latitude,view.current.latitude);
+            gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+            updateMarkers();
             last=now;
           }
           frame=requestAnimationFrame(draw);
@@ -85,15 +135,20 @@ export default function Globe({onSelect, active}){
       }catch{fallback()}
     };
     texture.src='/atlas/earth.webp';
-    return ()=>{stopped=true;cancelAnimationFrame(frame);el.removeEventListener('webglcontextlost',fallback);texture.onerror=null;if(!el.isConnected)gl.getExtension('WEBGL_lose_context')?.loseContext()};
+    return ()=>{stopped=true;cancelAnimationFrame(frame);el.removeEventListener('webglcontextlost',fallback);texture.onerror=null;renderManual.current=null;if(!el.isConnected)gl?.getExtension('WEBGL_lose_context')?.loseContext()};
   },[]);
   return <div className={'orbital '+(active?'approach':'')}>
     <div className="orbit" aria-hidden="true"/>
-    <div className="sphere"><canvas ref={canvas} aria-hidden="true" style={{opacity:phase==='ready'?1:0}}/></div>
+    <div className="sphere" tabIndex={phase==='unavailable'?-1:0} role="group"
+      aria-label="Глобус. Вращайте перетаскиванием или клавишами со стрелками."
+      onKeyDown={keyTurn} onPointerDown={startDrag} onPointerMove={moveDrag}
+      onLostPointerCapture={()=>{drag.current=null}}>
+      <canvas ref={canvas} aria-hidden="true" style={{display:phase==='ready'||phase==='loading'?'block':'none',opacity:phase==='ready'?1:0}}/><canvas ref={lowCanvas} aria-hidden="true" style={{display:phase==='software'?'block':'none'}}/></div>
     <div className="markers" ref={layer}>{countries.map(c=><button className="pin" key={c.id} style={position(c,center)} aria-label={'Выбрать страну: '+c.title} onClick={()=>onSelect(c.id)}>
       <span className="dot"/><span className="pin-label">{c.title}<em>Выбрать страну</em></span>
     </button>)}</div>
     {phase==='loading'&&<span className="loading" role="status">Загрузка глобуса…</span>}
   </div>
 }
+
 
