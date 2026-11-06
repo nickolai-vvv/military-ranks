@@ -6,6 +6,14 @@ import Quiz from "./Quiz";
 import army from "../public/ranks/catalog.json";
 import navy from "../public/ranks/navy/catalog.json";
 
+const introPhrases = [
+  "Насколько хорошо вы знаете воинские звания?",
+  "Сможете отличить лейтенанта от капитана?",
+  "Проверьте свои знания воинских званий.",
+  "Узнаете звание с первого взгляда?",
+  "От рядового до генерала. Знаете все звания?",
+];
+
 type Branch = "army" | "navy";
 type Screen = "world" | "branches" | Branch;
 const catalogs = {
@@ -25,6 +33,24 @@ const previous: Record<Exclude<Screen, "world">, Screen> = {
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("world"),
     [leaving, setLeaving] = useState<Screen | null>(null);
+  const [introIndex, setIntroIndex] = useState(0);
+  const introSelected = useRef(false);
+  useEffect(() => {
+    if (introSelected.current) return;
+    introSelected.current = true;
+    let index = Math.floor(Math.random() * introPhrases.length);
+    try {
+      const key = "introPhraseIndex";
+      const stored = sessionStorage.getItem(key);
+      if (stored !== null && Number.isInteger(Number(stored)) && Number(stored) >= 0) {
+        index = (Number(stored) + 1) % introPhrases.length;
+      }
+      sessionStorage.setItem(key, String(index));
+    } catch {
+      // When tab storage is unavailable, keep the random starting phrase.
+    }
+    setIntroIndex(index);
+  }, []);
   const heading = useRef<HTMLHeadingElement>(null),
     timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
@@ -79,10 +105,7 @@ export default function Home() {
                 Выбор <br />
                 страны
               </h1>
-              <p>
-                Учитесь узнавать воинские звания по погонам. В каждом раунде —
-                один погон и четыре варианта ответа.
-              </p>
+              <p>{introPhrases[introIndex]}</p>
             </div>
           </div>
         ) : (
