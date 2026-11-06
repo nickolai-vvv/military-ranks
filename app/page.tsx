@@ -85,6 +85,9 @@ export default function Home() {
   return (
     <div className={"shell " + (screen === "world" ? "map" : "inner")}>
       <header>
+        <a className="descriptor" href={basePath + "/"}>
+          СПРАВОЧНИК ВОИНСКИХ ЗВАНИЙ
+        </a>
         <a
           className="author"
           href="https://github.com/nickolai-vvv"
@@ -92,7 +95,6 @@ export default function Home() {
         >
           N-VVV
         </a>
-        <span className="descriptor">СПРАВОЧНИК ВОИНСКИХ ЗВАНИЙ</span>
       </header>
       <main key={screen} className={leaving ? "leaving" : ""}>
         {screen === "world" ? (

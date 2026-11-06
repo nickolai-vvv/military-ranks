@@ -11,6 +11,8 @@ header{min-height:84px;border-bottom:1px solid #a2b2bd35;z-index:1}
 .author{font-weight:680;font-size:23px;letter-spacing:-.03em;color:var(--paper);text-decoration:none}.author:hover{color:var(--amber)}.author:focus-visible{outline:2px solid var(--amber);outline-offset:5px}
 .descriptor,.eyebrow,footer,.back,.select,.loading,.quiz small{font:500 11px/1.6 Consolas,monospace;letter-spacing:.13em;text-transform:uppercase}
 .descriptor,footer{color:var(--muted)}
+.descriptor{text-decoration:none}.descriptor:hover{color:var(--amber)}.descriptor:focus-visible{outline:2px solid var(--amber);outline-offset:5px}
+@media(max-width:760px){header .descriptor{text-align:left}}
 main{flex:1;display:flex;position:relative;animation:arrive .65s ease}
 .world{position:relative;min-height:max(530px,calc(100svh - 148px));width:100%;display:flex;align-items:center}
 .intro{position:relative;pointer-events:none;margin:0 0 0 7vw;width:36%;text-shadow:0 2px 25px #080d12}
