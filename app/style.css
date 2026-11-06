@@ -29,7 +29,8 @@ p{color:#b7c0c4;line-height:1.65}
 .pin-label{position:absolute;left:calc(100% + 22px);top:-6px;padding:6px 11px;color:#fff3d7;background:#151c20de;border-bottom:1px solid #f1bc76;font:600 15px Consolas,monospace;text-transform:uppercase;letter-spacing:.15em}
 .pin-label:before{content:"";position:absolute;width:36px;height:1px;background:#f1bc76;right:100%;bottom:-1px;transform:rotate(-17deg);transform-origin:right}.pin-label em{position:absolute;left:0;top:110%;font:normal 12px "Segoe UI",sans-serif;letter-spacing:0;text-transform:none;white-space:nowrap;opacity:0;color:#fff}.pin:is(:hover,:focus-visible) em{opacity:1}.pin:hover .dot,.approach .dot{background:#ffbd65}
 .loading{position:absolute;bottom:-36px;width:100%;text-align:center}
-footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-items:center;gap:6px}.steps b{width:22px;height:2px;background:#58626a}.steps b.active{background:var(--amber)}.steps span{margin-left:12px}
+footer{min-height:64px;border-top:1px solid #a2b2bd35}.steps{display:flex;align-items:center}.steps button{display:grid;place-items:center;width:36px;height:44px;padding:0}.steps button:after{content:"";width:26px;height:2px;background:#58626a;transition:background .2s}.steps button[aria-current]:after,.steps button:hover:after{background:var(--amber)}
+
 .content{width:min(1060px,90%);margin:0 auto;padding:24px 0 40px}.content h1{font-size:clamp(34px,4vw,68px);margin:14px 0 26px}.back{padding:7px 0;margin-bottom:22px;color:#cbd0d1}
 .branches{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .branch{position:relative;isolation:isolate;overflow:hidden;min-height:380px;height:clamp(380px,54vh,620px);text-align:left;display:flex;align-items:flex-end;padding:clamp(18px,3vw,42px);box-shadow:inset 0 0 0 1px #ffffff21}
